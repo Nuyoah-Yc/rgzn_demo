@@ -35,16 +35,15 @@ def detector_face_image(prototxt_path,model_path,image_path):
             cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
             cv2.putText(image,text, (startX, y),cv2.FONT_HERSHEY_SIMPLEX,
                         0.45, (0,0,255),1)
-
     cv2.imshow("Output_Image",image)
     cv2.waitKey(0)
 
 if __name__=="__main__":
     # prototxt文件路径
-    prototxt_path =r"第一阶段/dnn_facerecognize/face_detector/deploy.prototxt"
+    prototxt_path = "./face_detector/deploy.prototxt"
     # model文件路径
-    model_path = r"第一阶段/dnn_facerecognize/face_detector/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
+    model_path =  "./face_detector/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
     # image路径
-    image_path = r"第一阶段/dnn_facerecognize/face.jpg"
+    image_path =  "./face.jpg"
 
     detector_face_image(prototxt_path, model_path, image_path)

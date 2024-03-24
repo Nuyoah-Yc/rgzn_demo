@@ -41,10 +41,10 @@ def detector_face_image(prototxt_path,model_path,image_path):
 
 if __name__=="__main__":
     # prototxt文件路径
-    prototxt_path =r"d:\Opencv4.10.0\opencv\sources\samples\dnn\face_detector\deploy.prototxt"
+    prototxt_path =r"第一阶段/dnn_facerecognize/face_detector/deploy.prototxt"
     # model文件路径
-    model_path = r"d:\Opencv4.10.0\opencv\sources\samples\dnn\face_detector\res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
+    model_path = r"第一阶段/dnn_facerecognize/face_detector/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
     # image路径
-    image_path = r"d:\img\face.jpg"
+    image_path = r"第一阶段/dnn_facerecognize/face.jpg"
 
     detector_face_image(prototxt_path, model_path, image_path)

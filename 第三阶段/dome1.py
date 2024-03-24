@@ -3,6 +3,8 @@ import cv2
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QFileDialog
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtCore import Qt
+
+
 class faceRecognize(QWidget):
     def __init__(self):
         super().__init__()

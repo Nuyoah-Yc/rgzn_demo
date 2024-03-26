@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+
 def detector_face_image(prototxt_path,model_path,image_path):
     # 加载
     print("loading model...")
@@ -48,3 +49,4 @@ if __name__=="__main__":
     image_path =  "./demo1.png"
 
     detector_face_image(prototxt_path, model_path, image_path)
+

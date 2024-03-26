@@ -12,7 +12,7 @@ class FaceRecognitionApp(QWidget):
         super().__init__()
 
         self.setWindowTitle('人脸检测界面')
-        self.resize(1000, 800)
+        self.setFixedSize(1000, 800)
 
         container = QHBoxLayout()
 
@@ -104,4 +104,6 @@ if __name__ == '__main__':
     window = FaceRecognitionApp()
     window.show()
     sys.exit(app.exec_())
+
+
 

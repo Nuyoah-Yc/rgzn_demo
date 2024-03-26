@@ -4,7 +4,7 @@ from keras.models import load_model
 
 # 加载预训练的口罩检测模型
 model = load_model('demo\my_model.keras')
-face_cascade = cv2.CascadeClassifier('D:\python\opencv\sources\data\haarcascades\haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 # 初始化平均置信度
 average_confidence = 0.0
 confidence_count = 0

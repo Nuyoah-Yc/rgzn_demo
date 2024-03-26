@@ -17,3 +17,5 @@ except sr.UnknownValueError:
     print("Google网络语音API无法理解音频")
 except sr.RequestError as e:
     print(f"无法从Google网络语音API请求结果；{e}")
+
+print("Google")

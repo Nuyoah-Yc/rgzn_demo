@@ -42,9 +42,9 @@ def detector_face_image(prototxt_path,model_path,image_path):
 
 if __name__=="__main__":
     # prototxt文件路径
-    prototxt_path = "model/deploy.prototxt"
+    prototxt_path = "./model/deploy.prototxt"
     # model文件路径
-    model_path = "model/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
+    model_path = "./model/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
     # image路径
     image_path =  "./demo1.png"
 

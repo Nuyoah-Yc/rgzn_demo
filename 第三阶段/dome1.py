@@ -70,8 +70,8 @@ class FaceRecognitionApp(QWidget):
         if self.image_cv is not None:
             gray = cv2.cvtColor(self.image_cv, cv2.COLOR_BGR2GRAY)
 
-            prototxt_path = r"./rlsb_sdk/deploy.prototxt"
-            model_path = r"./rlsb_sdk/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
+            prototxt_path = "./rlsb_sdk/deploy.prototxt"
+            model_path = "./rlsb_sdk/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
             net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
 
             (h, w) = gray.shape[:2]

@@ -88,8 +88,8 @@ class FaceRecognitionApp(QWidget):
 
                     cv2.rectangle(self.image_cv, (startX, startY), (endX, endY), (0, 255.0), 2)
                     text = "{:.2f}%".format(confidence * 100)
-                    y = startY - 10 if startY - 10 > 10 else startY + 10
-                    cv2.putText(self.image_cv, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    # y = startY - 10 if startY - 10 > 10 else startY + 10
+                    cv2.putText(self.image_cv, text, (startX-15, startY-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             img_rgb = cv2.cvtColor(self.image_cv, cv2.COLOR_BGR2RGB)
             h, w, ch = img_rgb.shape

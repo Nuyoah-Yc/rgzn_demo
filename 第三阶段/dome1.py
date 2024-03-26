@@ -1,40 +1,54 @@
 import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QFileDialog
+from PyQt5.QtGui import QPixmap, QImage
 import cv2
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QFileDialog
-from PyQt5.QtGui import QImage, QPixmap
+import numpy as np
 from PyQt5.QtCore import Qt
+import os
 
 
-class faceRecognize(QWidget):
+class FaceRecognitionApp(QWidget):
     def __init__(self):
         super().__init__()
+
         self.setWindowTitle('人脸检测界面')
-        self.setFixedSize(1000, 800)
+        self.resize(1000, 800)
+
+        container = QHBoxLayout()
 
         self.image_name_label = QLabel(self)
-        self.image_name_label.setGeometry(0, 0, 1000, 80)
         self.image_name_label.setAlignment(Qt.AlignCenter)
-        self.image_name_label.setStyleSheet("background:#567fff")
+        self.image_name_label.setFixedSize(1000, 60)
+        self.image_name_label.setStyleSheet("background: #567fff;")
 
         self.image_label = QLabel(self)
-        self.image_label.setGeometry(150, 150, 550, 550)
         self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.setStyleSheet("border:2px solid gray")
+        self.image_label.setFixedSize(550, 550)
+        self.image_label.setStyleSheet("border: 1px solid gray;")
+        container.addWidget(self.image_label)
 
-        load_up_button = QPushButton('上传图像', self)
-        load_up_button.setGeometry(800, 180, 90, 60)
-        load_up_button.setStyleSheet("border-radius:10px;color:white;background:#567fff;font-size:15px")
-
+        button_layout = QVBoxLayout()
+        upload_button = QPushButton('上传图像', self)
         recognize_button = QPushButton('开始识别', self)
-        recognize_button.setGeometry(800, 300, 90, 60)
-        recognize_button.setStyleSheet("border-radius:10px;color:white;background:#567fff;font-size:15px")
-
         exit_button = QPushButton('退出', self)
-        exit_button.setGeometry(800, 600, 90, 60)
-        exit_button.setStyleSheet("border-radius:10px;color:white;background:gray;font-size:15px")
 
-        load_up_button.clicked.connect(self.upload_image)
-        recognize_button.clicked.connect(self.recognize)
+        upload_button.setStyleSheet("background: #567fff;;border-radius:10px;color:white;font-size:18px")
+        recognize_button.setStyleSheet("background: #567fff;;border-radius:10px;color:white;font-size:18px")
+        exit_button.setStyleSheet("background:gray;border-radius:10px;color:white;font-size:18px")
+
+        upload_button.setFixedSize(90, 60)
+        recognize_button.setFixedSize(90, 60)
+        exit_button.setFixedSize(90, 60)
+
+        button_layout.addWidget(upload_button)
+        button_layout.addWidget(recognize_button)
+        button_layout.addWidget(exit_button)
+
+        container.addLayout(button_layout)
+        self.setLayout(container)
+
+        upload_button.clicked.connect(self.upload_image)
+        recognize_button.clicked.connect(self.recognize_face)
         exit_button.clicked.connect(self.close)
 
     def upload_image(self):
@@ -42,35 +56,52 @@ class faceRecognize(QWidget):
         if file:
             image = QImage(file)
             if not image.isNull():
-                # scaled_image 将是 QImage 对象尺寸与 image_label 的大小相匹配
                 scaled_image = image.scaled(self.image_label.size(), Qt.KeepAspectRatio)
-                # 调用了QPixmap类的fromImage静态方法，将scaled_image转换为QPixmap对象
                 pixmap = QPixmap.fromImage(scaled_image)
-                # 将QPixmap 对象（pixmap）设置为 QLabel 对象的图像内容
                 self.image_label.setPixmap(pixmap)
-                filename = self.image_name_label.setText(file)
-                self.image = cv2.imread(file)
-                if image is None:
+                filename = os.path.basename(file)  # 获取文件名
+                self.image_name_label.setText(filename)
+                self.image_cv = cv2.imread(file)
+                if self.image_cv is None:
                     print(f"Error: 图像文件 {filename} 无法加载。请检查文件路径和文件完整性。")
                     return
 
-    def recognize(self):
-        gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-        for (x, y, w, h) in faces:
-            cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        img_rgb = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-        h, w, ch = img_rgb.shape
-        # img_rgb.data这是NumPy数组的数据缓冲区，包含了图像的实际像素数据
-        q_image = QImage(img_rgb.data, w, h, ch * w, QImage.Format_RGB888)
-        pixmap = QPixmap.fromImage(q_image)
-        scaled_pixmap = pixmap.scaled(self.image_label.size(), Qt.KeepAspectRatio)
-        self.image_label.setPixmap(scaled_pixmap)
+    def recognize_face(self):
+        if self.image_cv is not None:
+            gray = cv2.cvtColor(self.image_cv, cv2.COLOR_BGR2GRAY)
+
+            prototxt_path = r"./rlsb_sdk/deploy.prototxt"
+            model_path = r"./rlsb_sdk/res10_300x300_ssd_iter_140000_fp16 (1).caffemodel"
+            net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
+
+            (h, w) = gray.shape[:2]
+            blob = cv2.dnn.blobFromImage(cv2.resize(self.image_cv, (300, 300)), 1.0, (300, 300), (104, 177, 123))
+
+            net.setInput(blob)
+            detections = net.forward()
+
+            for i in range(0, detections.shape[2]):
+                confidence = detections[0, 0, i, 2]
+                if confidence > 0.5:
+                    box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                    (startX, startY, endX, endY) = box.astype("int")
+
+                    cv2.rectangle(self.image_cv, (startX, startY), (endX, endY), (0, 255.0), 2)
+                    text = "{:.2f}%".format(confidence * 100)
+                    y = startY - 10 if startY - 10 > 10 else startY + 10
+                    cv2.putText(self.image_cv, text, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+            img_rgb = cv2.cvtColor(self.image_cv, cv2.COLOR_BGR2RGB)
+            h, w, ch = img_rgb.shape
+            q_image = QImage(img_rgb.data, w, h, ch * w, QImage.Format_RGB888)
+            pixmap = QPixmap.fromImage(q_image)
+            scaled_pixmap = pixmap.scaled(self.image_label.size(), Qt.KeepAspectRatio)
+            self.image_label.setPixmap(scaled_pixmap)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    w = faceRecognize()
-    w.show()
+    window = FaceRecognitionApp()
+    window.show()
     sys.exit(app.exec_())
+
